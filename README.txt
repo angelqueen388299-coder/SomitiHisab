@@ -1,12 +1,34 @@
-চূড়ান্ত সমিতি হিসাব Android Project
+name: Build Android APK
 
-এই project-এ Room/SQLite database dependency যুক্ত করা হয়েছে। লক্ষ্য:
-- ২০ সদস্য ও ক্রমিক নম্বর
-- প্রোফাইল/Edit
-- তারিখভিত্তিক ৳৫০ জমা
-- ৫ দিনের হিসাব
-- ৳৫,০০০ ড্র ও বিজয়ীকে স্থায়ীভাবে বাদ
-- ড্র ইতিহাস
-- Backup/Restore
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-গুরুত্বপূর্ণ: এই পরিবেশে APK compile/test করা সম্ভব নয়। Android Studio/Code on the Go-তে Gradle sync করে Build APK করতে হবে।
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: SomitiHisab-App
+          path: app/build/outputs/apk/debug/app-debug.apk
